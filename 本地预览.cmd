@@ -3,16 +3,28 @@ chcp 65001 >nul
 title 本地预览
 cd /d "%~dp0"
 
+set "NODE=node"
 where node >nul 2>nul
-if errorlevel 1 goto NONODE
+if not errorlevel 1 goto RUN
+if exist "C:\Program Files\nodejs\node.exe" set "NODE=C:\Program Files\nodejs\node.exe" & goto RUN
+if exist "C:\Program Files (x86)\nodejs\node.exe" set "NODE=C:\Program Files (x86)\nodejs\node.exe" & goto RUN
+if exist "%LOCALAPPDATA%\Programs\nodejs\node.exe" set "NODE=%LOCALAPPDATA%\Programs\nodejs\node.exe" & goto RUN
+goto NONODE
 
+:RUN
 echo 正在生成网站...
-node build.js
+"%NODE%" build.js
+if errorlevel 1 (
+  echo.
+  echo 生成失败，请把上面的报错内容发给懂的人看。
+  pause
+  exit /b 1
+)
 echo.
 echo 启动本地预览，浏览器会自动打开 http://localhost:4000
 echo 关闭这个窗口即可停止。
 echo.
-node serve.js
+"%NODE%" serve.js
 pause
 exit /b 0
 

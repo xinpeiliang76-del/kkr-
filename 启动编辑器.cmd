@@ -3,10 +3,18 @@ chcp 65001 >nul
 title 一键编辑器
 cd /d "%~dp0"
 
+set "NODE=node"
 where node >nul 2>nul
-if errorlevel 1 goto NONODE
+if not errorlevel 1 goto RUN
+if exist "C:\Program Files\nodejs\node.exe" set "NODE=C:\Program Files\nodejs\node.exe" & goto RUN
+if exist "C:\Program Files (x86)\nodejs\node.exe" set "NODE=C:\Program Files (x86)\nodejs\node.exe" & goto RUN
+if exist "%LOCALAPPDATA%\Programs\nodejs\node.exe" set "NODE=%LOCALAPPDATA%\Programs\nodejs\node.exe" & goto RUN
+goto NONODE
 
-node editor.js
+:RUN
+echo 正在启动编辑器...
+echo.
+"%NODE%" editor.js
 echo.
 echo 编辑器已停止。
 pause
