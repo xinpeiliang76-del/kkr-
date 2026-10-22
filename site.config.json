@@ -7,7 +7,6 @@
   "nav": [
     { "name": "纲要", "path": "manifesto.html" },
     { "name": "谱系", "path": "posts/left-tendencies-map.html" },
-    { "name": "教程", "path": "posts/build-your-own-site.html" },
     { "name": "关于", "path": "about.html" }
   ],
   "cover": {
