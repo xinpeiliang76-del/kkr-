@@ -2,28 +2,42 @@
 'use strict';
 
 /**
- * 一键编辑器 —— 本地跑起来，在浏览器里调颜色、字号、版心，实时看效果
+ * Theme Studio —— 静态网站的主题编辑器
  *
- *   启动：  node editor.js        （或双击「启动编辑器.cmd」）
- *   地址：  http://localhost:4100
+ *   用法：  node editor.js [--site <网站目录>] [--port 4100]
  *
- * 它只做两件事：
- *   1. 把 docs/ 当成网站显示在右边的预览框里；
- *   2. 把左边改出来的样式写进 theme.json，并自动重新生成 docs/。
- * 不联网、不上传、不碰 docs/ 里的 HTML。
+ *   它做的事：
+ *     1. 把 <网站目录>/docs 当成网站，显示在浏览器预览框里；
+ *     2. 把改出来的颜色和排版写进 <网站目录>/theme.json；
+ *     3. 如果该目录有 build.js，保存时自动重新生成网站。
+ *
+ *   不联网、不上传、不修改 docs/ 里的 HTML。
+ *
+ * 许可：MIT
  */
 
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { exec } = require('child_process');
-const { main: build } = require('./build.js');
+const { exec, spawnSync } = require('child_process');
 
-const ROOT = __dirname;
-const PORT = Number(process.env.PORT) || 4100;
-const THEME_FILE = path.join(ROOT, 'theme.json');
-const DOCS = path.join(ROOT, 'docs');
-const EDITOR = path.join(ROOT, 'editor');
+/* ---------------- 参数 ---------------- */
+
+function arg(name, fallback) {
+  const i = process.argv.indexOf('--' + name);
+  if (i !== -1 && process.argv[i + 1] && !process.argv[i + 1].startsWith('--')) return process.argv[i + 1];
+  const eq = process.argv.find((a) => a.startsWith('--' + name + '='));
+  if (eq) return eq.slice(name.length + 3);
+  return fallback;
+}
+
+const SITE = path.resolve(arg('site', process.cwd()));
+const PORT = Number(arg('port', process.env.PORT || 4100));
+const THEME_FILE = path.join(SITE, 'theme.json');
+const DOCS = path.join(SITE, 'docs');
+const BUILD_SCRIPT = path.join(SITE, 'build.js');
+const UI_DIR = __dirname;
+const UI_FILE = path.join(UI_DIR, 'ui.html');
 
 const DEFAULT_THEME = {
   colors: {
@@ -86,6 +100,7 @@ function cleanFont(v, fallback) {
 function sanitize(input) {
   const base = JSON.parse(JSON.stringify(DEFAULT_THEME));
   const src = input && typeof input === 'object' ? input : {};
+
   const pick = (group) => {
     const out = {};
     for (const k of Object.keys(base[group])) {
@@ -115,7 +130,7 @@ function sanitize(input) {
   return { colors, dark, type };
 }
 
-/* ---------------- 工具 ---------------- */
+/* ---------------- 站点操作 ---------------- */
 
 function readTheme() {
   try {
@@ -125,6 +140,20 @@ function readTheme() {
   }
 }
 
+function rebuild() {
+  if (!fs.existsSync(BUILD_SCRIPT)) {
+    return { built: false, message: '该目录没有 build.js，只保存了 theme.json，请自行重新生成网站。' };
+  }
+  const r = spawnSync(process.execPath, ['build.js'], { cwd: SITE, encoding: 'utf8' });
+  if (r.status !== 0) {
+    const detail = ((r.stderr || '') + (r.stdout || '')).trim().slice(0, 600);
+    throw new Error('重新生成失败：' + (detail || '未知错误'));
+  }
+  return { built: true, message: '已重新生成网站' };
+}
+
+/* ---------------- HTTP ---------------- */
+
 function send(res, status, body, type) {
   res.writeHead(status, {
     'Content-Type': type || 'application/json; charset=utf-8',
@@ -133,31 +162,45 @@ function send(res, status, body, type) {
   res.end(body);
 }
 
+function html(body) {
+  return '<meta charset="utf-8"><div style="font:15px/1.8 system-ui;padding:40px;max-width:640px;margin:auto">' + body + '</div>';
+}
+
 function sendFile(res, file) {
   fs.readFile(file, (err, data) => {
-    if (err) return send(res, 404, '<meta charset="utf-8"><h1>404</h1><p>找不到 ' + path.basename(file) + '</p>', MIME['.html']);
-    res.writeHead(200, { 'Content-Type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store' });
+    if (err) {
+      return send(res, 404, html('<h2>404</h2><p>找不到 <code>' + file + '</code></p><p><a href="/">回到编辑器</a></p>'), MIME['.html']);
+    }
+    res.writeHead(200, {
+      'Content-Type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream',
+      'Cache-Control': 'no-store',
+    });
     res.end(data);
   });
 }
-
-/* ---------------- 服务 ---------------- */
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
   const pathname = decodeURIComponent(url.pathname);
 
-  // 接口：读取当前主题
+  if (pathname === '/api/info') {
+    return send(res, 200, JSON.stringify({
+      site: SITE,
+      hasBuild: fs.existsSync(BUILD_SCRIPT),
+      hasDocs: fs.existsSync(DOCS),
+      hasTheme: fs.existsSync(THEME_FILE),
+      themeFile: THEME_FILE,
+    }));
+  }
+
   if (pathname === '/api/theme' && req.method === 'GET') {
     return send(res, 200, JSON.stringify(readTheme()));
   }
 
-  // 接口：恢复默认
   if (pathname === '/api/defaults' && req.method === 'GET') {
     return send(res, 200, JSON.stringify(DEFAULT_THEME));
   }
 
-  // 接口：保存并重新生成
   if (pathname === '/api/theme' && req.method === 'POST') {
     let body = '';
     req.on('data', (chunk) => {
@@ -172,24 +215,32 @@ const server = http.createServer((req, res) => {
         return send(res, 400, JSON.stringify({ ok: false, error: '提交的数据不是合法 JSON' }));
       }
       const theme = sanitize(parsed);
-      fs.writeFileSync(THEME_FILE, JSON.stringify(theme, null, 2) + '\n', 'utf8');
       try {
-        build();
-        send(res, 200, JSON.stringify({ ok: true, theme }));
+        fs.writeFileSync(THEME_FILE, JSON.stringify(theme, null, 2) + '\n', 'utf8');
       } catch (e) {
-        send(res, 500, JSON.stringify({ ok: false, error: '重新生成失败：' + e.message, theme }));
+        return send(res, 500, JSON.stringify({ ok: false, error: '写入 theme.json 失败：' + e.message }));
+      }
+      try {
+        const r = rebuild();
+        send(res, 200, JSON.stringify({ ok: true, theme, built: r.built, message: r.message }));
+      } catch (e) {
+        send(res, 500, JSON.stringify({ ok: false, error: e.message, theme }));
       }
     });
     return;
   }
 
-  // 编辑器界面
   if (pathname === '/' || pathname === '/editor' || pathname === '/editor.html') {
-    return sendFile(res, path.join(EDITOR, 'ui.html'));
+    return sendFile(res, UI_FILE);
   }
 
-  // 预览用的站点
   if (pathname === '/site' || pathname.startsWith('/site/')) {
+    if (!fs.existsSync(DOCS)) {
+      return send(res, 404, html(
+        '<h2>还没有生成网站</h2><p>目录 <code>' + DOCS + '</code> 不存在。</p>' +
+        '<p>先在该目录运行 <code>node build.js</code>，然后刷新。</p>'
+      ), MIME['.html']);
+    }
     let rel = pathname.replace(/^\/site\/?/, '');
     if (rel === '' || rel.endsWith('/')) rel += 'index.html';
     const file = path.join(DOCS, rel);
@@ -197,25 +248,28 @@ const server = http.createServer((req, res) => {
     return sendFile(res, file);
   }
 
-  // 编辑器自己的静态资源
-  const file = path.join(EDITOR, pathname.replace(/^\//, ''));
-  if (file.startsWith(EDITOR)) return sendFile(res, file);
+  const file = path.join(UI_DIR, pathname.replace(/^\//, ''));
+  if (file.startsWith(UI_DIR)) return sendFile(res, file);
   send(res, 404, 'not found', 'text/plain');
 });
 
 server.listen(PORT, '127.0.0.1', () => {
   const addr = 'http://localhost:' + PORT;
   console.log('');
-  console.log('  一键编辑器已启动');
+  console.log('  Theme Studio 已启动');
+  console.log('  网站目录：' + SITE);
+  console.log('  构建脚本：' + (fs.existsSync(BUILD_SCRIPT) ? '已找到 build.js（保存时自动重建）' : '未找到（只保存 theme.json）'));
+  console.log('  预览目录：' + (fs.existsSync(DOCS) ? 'docs ✓' : 'docs ✗ 还没有生成'));
+  console.log('');
   console.log('  ' + addr);
-  console.log('  关闭这个窗口即可停止（或按 Ctrl+C）');
+  console.log('  关掉窗口或按 Ctrl+C 停止');
   console.log('');
   if (process.env.NO_OPEN !== '1') exec('start "" "' + addr + '"', () => {});
 });
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    console.error('端口 ' + PORT + ' 已被占用，换一个：set PORT=4200 && node editor.js');
+    console.error('端口 ' + PORT + ' 被占用，换一个：node editor.js --port 4200');
   } else {
     console.error('启动失败：' + err.message);
   }

@@ -587,6 +587,15 @@ $('#reset').onclick = async () => {
 
 (async function start() {
   $('#port').textContent = location.host;
+  fetch('/api/info')
+    .then((r) => r.json())
+    .then((d) => {
+      if (d && d.site) {
+        const hint = document.querySelector('.hint');
+        if (hint) hint.textContent = d.site;
+      }
+    })
+    .catch(() => {});
   try {
     const res = await fetch('/api/theme');
     theme = await res.json();
