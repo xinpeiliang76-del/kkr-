@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>从零做一个自己的网站：给普通人的教程 · 冲突、纠错与解放</title>
+<meta name="description" content="这份教程写给不会写代码的人。跟着做完，你会有一个自己的网址，别人可以用手机打开。 全程不需要服务器、不需要备案、不需要付费。需要准备的只有三样：一台 Windows 电脑、一个邮箱、大约四十分钟。 先说清楚几件事 你会做出什么。一个静态网站……">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/theme.css">
+</head>
+<body>
+<header class="site-head">
+  <a class="brand" href="../index.html">冲突与纠错</a>
+  <nav class="nav"><a href="../manifesto.html">纲要</a><a href="../posts/left-tendencies-map.html">谱系</a><a href="../posts/build-your-own-site.html">教程</a><a href="../about.html">关于</a></nav>
+</header>
+<main>
+<article class="post">
+  <h1>从零做一个自己的网站：给普通人的教程</h1>
+  <p class="meta"><time>2026-10-24</time><span class="tags"><span class="tag">教程</span><span class="tag">建站</span></span></p>
+  <div class="prose">
+<p>这份教程写给不会写代码的人。跟着做完，你会有一个自己的网址，别人可以用手机打开。</p>
+<p>全程不需要服务器、不需要备案、不需要付费。需要准备的只有三样：一台 Windows 电脑、一个邮箱、大约四十分钟。</p>
+<h2>先说清楚几件事</h2>
+<p><strong>你会做出什么。</strong>一个静态网站：一堆已经写好的网页文件，放到 GitHub 的免费托管上，拿到类似 <code>你的用户名.github.io/仓库名/</code> 的网址。</p>
+<p><strong>为什么不用服务器。</strong>服务器是给&quot;每次访问都要现场计算&quot;的网站用的，比如论坛、商城。博客不需要现场计算，网页提前做好，谁来都是发同一个文件。既然只是发文件，就不必自己养一台机器。</p>
+<p><strong>代价是什么。</strong>没有后台管理界面，写文章靠改文本文件；国内访问 GitHub 的免费托管有时会慢，甚至打不开（后面有解决办法）。</p>
+<p><strong>你需要装什么。</strong>只有一个：Node.js。其他都是可选项，装不装都能做完。</p>
+<h2>第一步：装 Node.js</h2>
+<p>Node.js 是用来&quot;把 Markdown 变成网页&quot;的工具。打开：</p>
+<p><strong>&lt;https://nodejs.org/zh-cn&gt;</strong></p>
+<p>点页面上那个绿色的大按钮下载 LTS 版本（LTS 是长期支持版，选它，不要选 Current）。下载下来是个 <code>.msi</code> 文件，双击安装。</p>
+<p>安装过程中只注意一件事：<strong>保持默认选项，一路点&quot;下一步&quot;</strong>。默认会勾上 &quot;Add to PATH&quot;，这一项很重要，不要取消。</p>
+<p>装完验证一下。按键盘上的 <code>Win + R</code>，输入 <code>cmd</code>，回车，会弹出一个黑窗口——这个叫&quot;命令提示符&quot;，后面还会用到。在里面输入：</p>
+<pre><code>node -v</code></pre>
+<p>回车。如果显示类似 <code>v22.11.0</code> 的一行，说明装好了。</p>
+<blockquote>如果显示&quot;不是内部或外部命令&quot;，八成是安装时没有勾 PATH，或者黑窗口是在安装之前就开着的。关掉黑窗口重新开一个再试；还不行就重装一遍 Node.js。</blockquote>
+<h2>第二步：拿到网站的源码</h2>
+<p>这个站的全部文件就是一个文件夹。两种拿法：</p>
+<p><strong>方法一，下载压缩包。</strong>打开仓库页面，点绿色的 <code>Code</code> 按钮 → <code>Download ZIP</code>，解压到桌面。会得到一个 <code>blog</code> 文件夹。</p>
+<p><strong>方法二，如果你已经装了 Git。</strong>在命令提示符里：</p>
+<pre><code>git clone https://github.com/xinpeiliang76-del/kkr-.git</code></pre>
+<h2>第三步：在本地把它跑起来</h2>
+<p>打开 <code>blog</code> 文件夹，你会看到这些：</p>
+<table>
+<thead>
+<tr><th>名字</th><th>作用</th></tr>
+</thead>
+<tbody>
+<tr><td><code>posts</code></td><td>文章，每篇一个 <code>.md</code> 文件</td></tr>
+<tr><td><code>pages</code></td><td>独立页面（比如&quot;关于&quot;）</td></tr>
+<tr><td><code>site.config.json</code></td><td>站点名字、简介、导航</td></tr>
+<tr><td><code>theme.json</code></td><td>颜色和字号</td></tr>
+<tr><td><code>assets</code></td><td>样式表</td></tr>
+<tr><td><code>docs</code></td><td>生成出来的网页（自动产生，不用手改）</td></tr>
+<tr><td><code>启动编辑器.cmd</code></td><td>双击运行的按钮</td></tr>
+</tbody>
+</table>
+<p><strong>双击 <code>本地预览.cmd</code>。</strong>会弹出一个黑窗口，同时浏览器自动打开 <code>http://localhost:4000</code>，你就能看到网站了。</p>
+<p>黑窗口不要关，它就是服务器。关掉网站就打不开了。</p>
+<blockquote><code>localhost</code> 的意思是&quot;这台电脑自己&quot;。所以这个地址只有你能打开，别人打不开——这是正常的，等第六步发布出去才是给人看的。</blockquote>
+<h2>第四步：改文字</h2>
+<h3>改站名和简介</h3>
+<p>用记事本（或者更好的编辑器，见后面的软件清单）打开 <code>site.config.json</code>，会看到这样的内容：</p>
+<pre><code>{
+  &quot;title&quot;: &quot;冲突、纠错与解放&quot;,
+  &quot;shortTitle&quot;: &quot;冲突与纠错&quot;,
+  &quot;description&quot;: &quot;这里是一句介绍&quot;,
+  &quot;author&quot;: &quot;你的名字&quot;,
+  &quot;github&quot;: &quot;https://github.com/你的用户名&quot;,
+  &quot;nav&quot;: [
+    { &quot;name&quot;: &quot;纲要&quot;, &quot;path&quot;: &quot;manifesto.html&quot; }
+  ],
+  &quot;cover&quot;: {
+    &quot;kicker&quot;: &quot;CONFLICT · CORRECTION · EMANCIPATION&quot;,
+    &quot;title&quot;: &quot;冲突、纠错与解放&quot;,
+    &quot;subtitle&quot;: &quot;——副标题写在这里&quot;,
+    &quot;note&quot;: &quot;文 / 你的名字 · 2026&quot;
+  },
+  &quot;pillars&quot;: [
+    { &quot;num&quot;: &quot;壹&quot;, &quot;name&quot;: &quot;第一条&quot;, &quot;text&quot;: &quot;这一条说了什么。&quot; }
+  ]
+}</code></pre>
+<p>规则很简单：<strong>引号里的字改成你的，冒号和逗号不要动，引号不要丢。</strong></p>
+<p>改完保存，回到浏览器按 <code>F5</code> 刷新。没变化就说明黑窗口里的程序没重新跑——见下面的&quot;改完没反应&quot;。</p>
+<h3>写一篇新文章</h3>
+<p>在 <code>posts</code> 文件夹里新建一个文本文件，名字必须遵守这个格式：</p>
+<pre><code>2026-10-25-我的第一篇文章.md</code></pre>
+<p>前半截是日期，后半截会变成网址，所以<strong>发布以后别改名</strong>，改了旧链接就打不开。</p>
+<p>用记事本打开，第一段写两行开头的&quot;说明书&quot;：</p>
+<pre><code>---
+title: 我的第一篇文章
+tags: 随笔
+---
+
+正文从这一行开始写。</code></pre>
+<p>两条横线之间的部分是给程序看的，<code>title</code> 是标题，<code>tags</code> 是标签。下面的正文用 Markdown 写。</p>
+<h3>Markdown 就这三样够用了</h3>
+<p><strong>标题</strong>：行首写两个井号加一个空格：</p>
+<pre><code>## 这是一个小标题</code></pre>
+<p><strong>加粗</strong>：用两个星号包起来：<code>**这几个字会变粗**</code></p>
+<p><strong>列表</strong>：行首一个减号加空格：</p>
+<pre><code>- 第一项
+- 第二项</code></pre>
+<p>链接写成 <code>[显示的文字](https://网址)</code>，粗体写成 <code>**文字**</code>，够写博客了。想看更多语法，网上搜&quot;Markdown 语法&quot;随便一篇都能对照。</p>
+<h3>改完没反应？</h3>
+<p><code>docs</code> 里的网页不是自动更新的。三种办法让它重新生成：</p>
+<ul>
+<li>双击 <code>生成网站.cmd</code>；</li>
+<li>或在命令提示符里进入 <code>blog</code> 文件夹，运行 <code>node build.js</code>；</li>
+<li>或者用下一步的编辑器，它保存时会自动重新生成。</li>
+</ul>
+<h2>第五步：换颜色和样式</h2>
+<p>这是最省事的一部分。<strong>双击 <code>启动编辑器.cmd</code></strong>，浏览器会打开一个编辑界面：左边是调色面板，右边是真实网站的实时预览。</p>
+<p>能改的东西：</p>
+<ul>
+<li><strong>预设方案</strong>：六种配色，点一下立刻套用，包括朱红纸本、靛蓝冷灰、墨黑极简等；</li>
+<li><strong>亮色 / 暗色</strong>：分别调纸色（背景）、墨色（文字）、强调色、线条色。暗色是系统切到深色模式时自动生效的那套；</li>
+<li><strong>字号、行高、版心宽</strong>：三个滑杆，拖的时候右边马上跟着变；</li>
+<li><strong>字体</strong>：宋体、黑体、楷体、系统界面、等宽，五选一。</li>
+</ul>
+<p>调满意了点 <strong>「保存并重新生成」</strong>，改动写进 <code>theme.json</code>，<code>docs</code> 里所有页面同时更新。想反悔就点「恢复默认」。</p>
+<blockquote>编辑器只改颜色和排版，不改文字。文字仍然在 <code>posts</code> 和 <code>pages</code> 里改——这样分工其实更安全：配色永远不会把你的文章改坏。</blockquote>
+<p>如果连双击都嫌麻烦，也可以直接打开 <code>theme.json</code> 改里面那几行十六进制颜色值，效果一样。</p>
+<h2>第六步：发布到 GitHub Pages</h2>
+<p>到这一步，网站还只在你电脑上。发布就是把它传到 GitHub。</p>
+<h3>注册</h3>
+<p>打开 &lt;https://github.com/signup&gt;，用邮箱注册，验证邮箱。免费账号就够。</p>
+<h3>建仓库</h3>
+<p>登录后点右上角的 <code>+</code> → <code>New repository</code>。名字随便起，比如 <code>my-blog</code>；可见性选 <strong>Public</strong>（公开）；下面的 &quot;Add a README file&quot; 之类都不要勾。点 <code>Create repository</code>。</p>
+<h3>传文件</h3>
+<p>进入刚建好的仓库，点 <code>Add file</code> → <code>Upload files</code>。</p>
+<p><strong>这一步有个坑</strong>：要把 <code>blog</code> 文件夹<strong>里面的东西</strong>全选拖进去，而不是把 <code>blog</code> 文件夹本身拖进去。拖文件夹的话会多出一层目录，后面设置对不上。</p>
+<p>具体操作：打开 <code>blog</code> 文件夹，按 <code>Ctrl + A</code> 全选，把 <code>assets</code>、<code>docs</code>、<code>pages</code>、<code>posts</code>、<code>build.js</code>、<code>editor.js</code>、<code>site.config.json</code>、<code>theme.json</code> 这些一起拖到网页的上传区，然后点页面下方的 <code>Commit changes</code>。</p>
+<h3>打开 Pages</h3>
+<p>进仓库的 <code>Settings</code>（顶部菜单） → 左侧栏找 <code>Pages</code> → 在 <code>Source</code> 里选 <strong><code>Deploy from a branch</code></strong> → 分支选 <code>main</code>，目录选 <strong><code>/docs</code></strong> → 点 <code>Save</code>。</p>
+<p>等一到两分钟，刷新这个页面，顶会出现一行绿字：<code>Your site is live at https://....github.io/..../</code>——那就是你的网址。</p>
+<h3>网址长什么样</h3>
+<p>仓库叫 <code>my-blog</code>，用户名是 <code>xiaoming</code>，网址就是：</p>
+<pre><code>https://xiaoming.github.io/my-blog/</code></pre>
+<p>如果仓库名恰好是 <code>xiaoming.github.io</code>，网址就是 <code>https://xiaoming.github.io/</code>（没有后面的路径）。</p>
+<h3>打不开怎么办</h3>
+<ul>
+<li><strong>404</strong>：先看 Pages 设置里的目录是不是 <code>/docs</code>，再确认仓库里确实有 <code>docs</code> 文件夹，且里面有 <code>index.html</code>；</li>
+<li><strong>构建失败</strong>：点仓库顶部的 <code>Actions</code> 标签，红色叉号点进去看报错；</li>
+<li><strong>很慢或打不开</strong>：这是国内访问 GitHub 免费托管的常见情况。可以换个托管：注册 Cloudflare Pages 或 Vercel，用同一个 GitHub 仓库导入，几分钟就能得到一个更快的地址，网站文件一个字都不用改。</li>
+</ul>
+<h2>第七步：以后怎么更新</h2>
+<p>改了文章或颜色之后，需要重新上传。两条路：</p>
+<p><strong>装 Git（推荐，一次麻烦，长期省事）。</strong>下载安装：&lt;https://git-scm.com/download/win&gt;，安装时全部默认。然后在 <code>blog</code> 文件夹里右键选择&quot;在终端中打开&quot;，依次运行：</p>
+<pre><code>git add .
+git commit -m &quot;更新文章&quot;
+git push</code></pre>
+<p>第一次推送会要求登录。注意：<strong>不能用账号密码</strong>，要去 GitHub 设置里生成一个 Token 当密码用（Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token，勾选 <code>repo</code>，复制那串 <code>ghp_</code> 开头的字符）。</p>
+<p><strong>不装 Git。</strong>回到仓库页面，<code>Add file</code> → <code>Upload files</code>，把改动过的文件重新拖上去，提交。笨但有效。</p>
+<h2>软件清单</h2>
+<p>全部免费，全部是官网，没有捆绑安装。</p>
+<table>
+<thead>
+<tr><th>软件</th><th>用途</th><th>下载地址</th></tr>
+</thead>
+<tbody>
+<tr><td>Node.js</td><td>必须，生成网站</td><td>&lt;https://nodejs.org/zh-cn&gt;</td></tr>
+<tr><td>Visual Studio Code</td><td>写文章舒服得多，有 Markdown 预览</td><td>&lt;https://code.visualstudio.com/&gt;</td></tr>
+<tr><td>Git</td><td>命令行上传网站</td><td>&lt;https://git-scm.com/download/win&gt;</td></tr>
+<tr><td>GitHub Desktop</td><td>图形化上传，不用记命令</td><td>&lt;https://desktop.github.com/&gt;</td></tr>
+<tr><td>Obsidian</td><td>本地笔记软件，适合先写完再导出</td><td>&lt;https://obsidian.md/&gt;</td></tr>
+<tr><td>7-Zip</td><td>解压 ZIP 包</td><td>&lt;https://www.7-zip.org/&gt;</td></tr>
+</tbody>
+</table>
+<p>可选的两个替代下载源（国内访问 nodejs.org 慢时用）：Node.js 镜像 &lt;https://npmmirror.com/mirrors/node/&gt;。</p>
+<h2>常见问题</h2>
+<p><strong>&quot;node 不是内部或外部命令&quot;</strong></p>
+<p>Node.js 没装，或者装了没重启命令行窗口。关掉黑窗口重新开。</p>
+<p><strong>双击 cmd 文件闪一下就没了</strong></p>
+<p>说明 Node.js 没装好。手动打开黑窗口，用 <code>cd</code> 进到 <code>blog</code> 目录再运行 <code>node build.js</code>，就能看到具体报错。</p>
+<p><strong>改了文章但网址上还是旧的</strong></p>
+<p>本地改完必须重新生成（编辑器保存会自动生成，其余情况要跑 <code>node build.js</code>），然后还要把 <code>docs</code> 里的新文件也传上去。两件事都做了才会变。</p>
+<p><strong>能上传但仓库里没有 docs 文件夹</strong></p>
+<p>GitHub 网页上传会跳过以点开头的文件（比如 <code>.gitignore</code>），也可能在拖拽时漏掉子文件夹。传完点进仓库看一眼，缺了就用 <code>Add file</code> → <code>Create new file</code>，文件名写 <code>docs/index.html</code> 手动补。</p>
+<p><strong>想让网站私有</strong></p>
+<p>Settings → 最下方 Danger Zone → Change visibility → Make private。注意：<strong>私有仓库的 GitHub Pages 需要付费账户</strong>，转私有后网站会下线。</p>
+<p><strong>想要评论功能</strong></p>
+<p>静态站没有后端。常见做法是接 giscus（把评论存在 GitHub Discussions 里，免费无广告），在 GitHub 上搜 giscus 按它的引导做。</p>
+<h2>术语表</h2>
+<p><strong>静态网站</strong>：网页是提前做好的文件，访问时原样发出去，不现场计算。</p>
+<p><strong>Markdown</strong>：一种用纯文本写文章的格式，用 <code>##</code> 表示标题、<code>**</code> 表示加粗，写完能转成网页。</p>
+<p><strong>仓库（repository）</strong>：GitHub 上的一个文件夹，存着网站的全部文件和历史版本。</p>
+<p><strong>分支（branch）</strong>：仓库里的一条时间线，默认叫 <code>main</code>，就是主线。</p>
+<p><strong>GitHub Pages</strong>：GitHub 提供的免费网站托管，把文件放上去就给你一个网址。</p>
+<p><strong>localhost</strong>：指&quot;这台电脑自己&quot;。所以 <code>localhost:4000</code> 只有你能打开。</p>
+<p><strong>终端 / 命令提示符</strong>：黑色的窗口，用输命令代替点鼠标。<code>Win + R</code> 输入 <code>cmd</code> 打开。</p>
+<hr>
+<p>这套东西没有一处是必须的，除了那台电脑和那个邮箱。如果中途卡住，把报错原文贴出来问人，比描述&quot;它坏了&quot;有用得多。</p>
+  </div>
+</article>
+<p class="back"><a href="../index.html">← 回到首页</a></p>
+</main>
+<footer class="site-foot">
+  <span>© 2026 lxpwp</span>
+  <span class="sep">·</span><a href="https://github.com/xinpeiliang76-del" target="_blank" rel="noopener">GitHub</a>
+  <span class="sep">·</span>
+  <span>Markdown 写就，静态托管</span>
+</footer>
+</body>
+</html>

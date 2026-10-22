@@ -64,6 +64,8 @@ http
     });
   })
   .listen(PORT, () => {
-    console.log('本地预览： http://localhost:' + PORT);
+    const addr = 'http://localhost:' + PORT;
+    console.log('本地预览： ' + addr);
     console.log('按 Ctrl+C 停止');
+    if (PORT === 4000) require('child_process').exec('start "" "' + addr + '"', () => {});
   });

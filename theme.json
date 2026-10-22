@@ -1,0 +1,26 @@
+{
+  "colors": {
+    "paper": "#f4efe3",
+    "paper2": "#eee7d6",
+    "ink": "#1a1613",
+    "muted": "#6d6255",
+    "accent": "#971c1c",
+    "accent2": "#b23a2e",
+    "rule": "#d9ceb9"
+  },
+  "dark": {
+    "paper": "#131110",
+    "paper2": "#1c1917",
+    "ink": "#e9e1d1",
+    "muted": "#9b8f7e",
+    "accent": "#d1554a",
+    "accent2": "#e0705f",
+    "rule": "#302a24"
+  },
+  "type": {
+    "fontBody": "\"Songti SC\", \"Source Han Serif SC\", \"Noto Serif CJK SC\", \"SimSun\", Georgia, serif",
+    "fontSize": "17.5px",
+    "lineHeight": "1.95",
+    "maxWidth": "44rem"
+  }
+}

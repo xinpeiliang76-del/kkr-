@@ -1,0 +1,29 @@
+/* 由 theme.json 自动生成，请勿手改；改 theme.json 或使用编辑器 */
+:root {
+  --paper: #f4efe3;
+  --paper-2: #eee7d6;
+  --ink: #1a1613;
+  --muted: #6d6255;
+  --red: #971c1c;
+  --red-2: #b23a2e;
+  --rule: #d9ceb9;
+  --max: 44rem;
+}
+
+body {
+  font-family: "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", "SimSun", Georgia, serif;
+  font-size: 17.5px;
+  line-height: 1.95;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #131110;
+    --paper-2: #1c1917;
+    --ink: #e9e1d1;
+    --muted: #9b8f7e;
+    --red: #d1554a;
+    --red-2: #e0705f;
+    --rule: #302a24;
+  }
+}

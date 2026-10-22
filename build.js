@@ -313,6 +313,7 @@ function layout({ title, description, content, prefix, bodyClass }) {
 <title>${pageTitle}</title>
 <meta name="description" content="${desc}">
 <link rel="stylesheet" href="${p}assets/style.css">
+<link rel="stylesheet" href="${p}assets/theme.css">
 </head>
 <body${bodyClass ? ' class="' + bodyClass + '"' : ''}>
 <header class="site-head">
@@ -408,6 +409,61 @@ ${items || '    <li class="item"><div><p class="excerpt">还没有文章。</p><
   return layout({ title: '', description: SITE.description, content, prefix: './' });
 }
 
+/* ============================== 主题 ============================== */
+
+/**
+ * theme.json → docs/assets/theme.css
+ * 只覆盖 CSS 变量，不动 style.css 的骨架，所以改颜色永远不会把版式改坏。
+ */
+function themeCSS() {
+  const file = path.join(ROOT, 'theme.json');
+  let t = {};
+  if (fs.existsSync(file)) {
+    try {
+      t = JSON.parse(fs.readFileSync(file, 'utf8'));
+    } catch (e) {
+      console.warn('⚠ theme.json 解析失败，改用 style.css 里的默认值：' + e.message);
+    }
+  }
+  const c = t.colors || {};
+  const d = t.dark || {};
+  const ty = t.type || {};
+
+  const vars = (o) => {
+    const rows = [];
+    if (o.paper) rows.push('  --paper: ' + o.paper + ';');
+    if (o.paper2) rows.push('  --paper-2: ' + o.paper2 + ';');
+    if (o.ink) rows.push('  --ink: ' + o.ink + ';');
+    if (o.muted) rows.push('  --muted: ' + o.muted + ';');
+    if (o.accent) rows.push('  --red: ' + o.accent + ';');
+    if (o.accent || o.accent2) rows.push('  --red-2: ' + (o.accent2 || o.accent) + ';');
+    if (o.rule) rows.push('  --rule: ' + o.rule + ';');
+    return rows.join('\n');
+  };
+
+  const bodyRows = [];
+  if (ty.fontBody) bodyRows.push('  font-family: ' + ty.fontBody + ';');
+  if (ty.fontSize) bodyRows.push('  font-size: ' + ty.fontSize + ';');
+  if (ty.lineHeight) bodyRows.push('  line-height: ' + ty.lineHeight + ';');
+
+  const light = vars(c);
+  const darkVars = vars(d);
+  const rootExtra = ty.maxWidth ? '  --max: ' + ty.maxWidth + ';' : '';
+
+  let css = '/* 由 theme.json 自动生成，请勿手改；改 theme.json 或使用编辑器 */\n';
+  if (light || rootExtra) {
+    css += ':root {\n' + [light, rootExtra].filter(Boolean).join('\n') + '\n}\n';
+  }
+  if (bodyRows.length) css += '\nbody {\n' + bodyRows.join('\n') + '\n}\n';
+  if (darkVars) {
+    css += '\n@media (prefers-color-scheme: dark) {\n  :root {\n' +
+      darkVars.split('\n').map((l) => '  ' + l).join('\n') + '\n  }\n}\n';
+  }
+
+  fs.mkdirSync(path.join(OUT_DIR, 'assets'), { recursive: true });
+  fs.writeFileSync(path.join(OUT_DIR, 'assets', 'theme.css'), css, 'utf8');
+}
+
 /* ============================== 输出 ============================== */
 
 function write(rel, html) {
@@ -443,6 +499,7 @@ function main() {
   write('index.html', indexPage(posts));
 
   copyDir(ASSETS_DIR, path.join(OUT_DIR, 'assets'));
+  themeCSS();
   fs.writeFileSync(path.join(OUT_DIR, '.nojekyll'), '');
 
   console.log('构建完成 →  docs/');
@@ -450,4 +507,6 @@ function main() {
   for (const p of posts) console.log('  · ' + (p.date || '----------') + '  ' + p.title + '   →  docs/posts/' + p.slug + '.html');
 }
 
-main();
+if (require.main === module) main();
+
+module.exports = { main };

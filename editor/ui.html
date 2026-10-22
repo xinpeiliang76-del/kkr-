@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>样式编辑器</title>
+<style>
+  * { box-sizing: border-box; }
+
+  :root {
+    --bg: #17181a;
+    --panel: #1f2124;
+    --panel-2: #26282c;
+    --line: #33363b;
+    --fg: #e8e6e1;
+    --muted: #9a9992;
+    --accent: #e0785f;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 13px;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ---------- 左栏 ---------- */
+
+  aside {
+    width: 344px;
+    flex: 0 0 344px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+  }
+
+  .head {
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .head h1 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .head p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11.5px;
+    line-height: 1.6;
+  }
+
+  .scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 18px 18px;
+  }
+
+  .scroll::-webkit-scrollbar { width: 8px; }
+  .scroll::-webkit-scrollbar-thumb { background: #3a3d42; border-radius: 4px; }
+
+  section { padding: 16px 0 4px; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+
+  h2 {
+    margin: 0 0 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .presets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    margin-bottom: 8px;
+  }
+
+  .preset {
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--fg);
+    border-radius: 5px;
+    padding: 7px 9px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    text-align: left;
+  }
+
+  .preset:hover { border-color: #4b4f56; }
+  .preset .dots { display: flex; gap: 2px; }
+  .preset .dots i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+
+  .row {
+    display: grid;
+    grid-template-columns: 74px 1fr 74px;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .row label { color: var(--muted); font-size: 12px; }
+
+  input[type="color"] {
+    width: 100%;
+    height: 26px;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+  }
+
+  input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+  input[type="color"]::-webkit-color-swatch { border: none; border-radius: 2px; }
+
+  input[type="text"] {
+    width: 100%;
+    height: 26px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--fg);
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 11px;
+    padding: 0 7px;
+  }
+
+  input[type="text"]:focus { outline: 1px solid var(--accent); }
+
+  .slider {
+    display: grid;
+    grid-template-columns: 74px 1fr 48px;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .slider span.val {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  select {
+    width: 100%;
+    height: 28px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--fg);
+    padding: 0 6px;
+    font-size: 12px;
+  }
+
+  .foot {
+    padding: 12px 18px 16px;
+    border-top: 1px solid var(--line);
+    background: var(--panel);
+  }
+
+  .actions { display: flex; gap: 8px; }
+
+  button.primary, button.ghost {
+    flex: 1;
+    height: 34px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    border: 1px solid transparent;
+  }
+
+  button.primary { background: var(--accent); color: #1a1210; border-color: var(--accent); }
+  button.primary:hover { filter: brightness(1.08); }
+  button.ghost { background: transparent; border-color: var(--line); color: var(--fg); }
+  button.ghost:hover { border-color: #4b4f56; }
+
+  .status {
+    margin-top: 9px;
+    font-size: 11.5px;
+    color: var(--muted);
+    min-height: 16px;
+    line-height: 1.5;
+  }
+
+  .status.ok { color: #7fc48a; }
+  .status.err { color: #e0785f; }
+
+  /* ---------- 右栏 ---------- */
+
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: #0f1012;
+  }
+
+  .toolbar {
+    height: 42px;
+    flex: 0 0 42px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+
+  .toolbar select { width: auto; min-width: 140px; height: 26px; }
+
+  .toolbar .hint {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .stage { flex: 1; padding: 14px; min-height: 0; }
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+  }
+
+  .badge {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 2px 6px;
+  }
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="head">
+    <h1>样式编辑器</h1>
+    <p>改左边的值，右边立刻变。点「保存并重新生成」写入 theme.json 并重建站点。</p>
+  </div>
+
+  <div class="scroll">
+    <section>
+      <h2>预设方案</h2>
+      <div class="presets" id="presets"></div>
+    </section>
+
+    <section>
+      <h2>亮色</h2>
+      <div id="lightColors"></div>
+    </section>
+
+    <section>
+      <h2>暗色（跟随系统）</h2>
+      <div id="darkColors"></div>
+    </section>
+
+    <section>
+      <h2>排版</h2>
+      <div class="slider">
+        <label>字号</label>
+        <input type="range" id="fontSize" min="13" max="22" step="0.5">
+        <span class="val" id="fontSizeVal"></span>
+      </div>
+      <div class="slider">
+        <label>行高</label>
+        <input type="range" id="lineHeight" min="1.4" max="2.4" step="0.05">
+        <span class="val" id="lineHeightVal"></span>
+      </div>
+      <div class="slider">
+        <label>版心宽</label>
+        <input type="range" id="maxWidth" min="32" max="60" step="1">
+        <span class="val" id="maxWidthVal"></span>
+      </div>
+      <div class="row" style="grid-template-columns: 74px 1fr;">
+        <label>字体</label>
+        <select id="fontBody"></select>
+      </div>
+    </section>
+  </div>
+
+  <div class="foot">
+    <div class="actions">
+      <button class="primary" id="save">保存并重新生成</button>
+      <button class="ghost" id="reset">恢复默认</button>
+    </div>
+    <div class="status" id="status">已连接到本地服务</div>
+  </div>
+</aside>
+
+<main>
+  <div class="toolbar">
+    <select id="pageSel"></select>
+    <button class="ghost" id="reload" style="flex:0 0 auto; height:26px; padding:0 12px;">刷新</button>
+    <span class="badge" id="port"></span>
+    <span class="hint">预览区为真实网站，交互已禁用</span>
+  </div>
+  <div class="stage">
+    <iframe id="preview" src="/site/index.html"></iframe>
+  </div>
+</main>
+
+<script>
+const COLOR_FIELDS = [
+  ['paper', '纸色'],
+  ['paper2', '背景块'],
+  ['ink', '墨色'],
+  ['muted', '次要字'],
+  ['accent', '强调色'],
+  ['accent2', '强调浅'],
+  ['rule', '线条'],
+];
+
+const FONTS = [
+  ['宋体（默认）', '"Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", "SimSun", Georgia, serif'],
+  ['黑体', '"PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "Source Han Sans SC", system-ui, sans-serif'],
+  ['楷体', '"Kaiti SC", "KaiTi", "STKaiti", "Songti SC", serif'],
+  ['系统界面', 'system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif'],
+  ['等宽', 'ui-monospace, Menlo, Consolas, "Courier New", monospace'],
+];
+
+const PRESETS = [
+  {
+    name: '朱红纸本',
+    colors: { paper:'#f4efe3', paper2:'#eee7d6', ink:'#1a1613', muted:'#6d6255', accent:'#971c1c', accent2:'#b23a2e', rule:'#d9ceb9' },
+    dark:   { paper:'#131110', paper2:'#1c1917', ink:'#e9e1d1', muted:'#9b8f7e', accent:'#d1554a', accent2:'#e0705f', rule:'#302a24' },
+    type:   { fontSize:'17.5px', lineHeight:'1.95', maxWidth:'44rem' },
+  },
+  {
+    name: '靛蓝冷灰',
+    colors: { paper:'#eef1f5', paper2:'#e3e9f1', ink:'#141a22', muted:'#5c6674', accent:'#1f4e8c', accent2:'#2f6bb0', rule:'#ccd6e2' },
+    dark:   { paper:'#0f1216', paper2:'#171c22', ink:'#dfe6ef', muted:'#8590a0', accent:'#6ea8e8', accent2:'#8bbcff', rule:'#28303a' },
+    type:   { fontSize:'17px', lineHeight:'1.9', maxWidth:'44rem' },
+  },
+  {
+    name: '墨黑极简',
+    colors: { paper:'#fbfbf9', paper2:'#f1f1ee', ink:'#111111', muted:'#666666', accent:'#222222', accent2:'#444444', rule:'#dcdcd8' },
+    dark:   { paper:'#0d0d0d', paper2:'#161616', ink:'#ededed', muted:'#8a8a8a', accent:'#c9c9c9', accent2:'#e0e0e0', rule:'#2a2a2a' },
+    type:   { fontSize:'17px', lineHeight:'1.95', maxWidth:'40rem' },
+  },
+  {
+    name: '松墨绿',
+    colors: { paper:'#f1f3ea', paper2:'#e7ecdd', ink:'#1b211a', muted:'#5c6657', accent:'#2f5d3a', accent2:'#417a4e', rule:'#d2dcc6' },
+    dark:   { paper:'#101510', paper2:'#171d17', ink:'#e2ead9', muted:'#8b9683', accent:'#7fbc8a', accent2:'#9dd4a6', rule:'#2a332a' },
+    type:   { fontSize:'17.5px', lineHeight:'1.95', maxWidth:'44rem' },
+  },
+  {
+    name: '高对比',
+    colors: { paper:'#ffffff', paper2:'#f2f2f2', ink:'#000000', muted:'#444444', accent:'#c00000', accent2:'#e00000', rule:'#bbbbbb' },
+    dark:   { paper:'#000000', paper2:'#111111', ink:'#ffffff', muted:'#aaaaaa', accent:'#ff5a5a', accent2:'#ff8080', rule:'#3a3a3a' },
+    type:   { fontSize:'18px', lineHeight:'1.8', maxWidth:'46rem' },
+  },
+  {
+    name: '夜蓝',
+    colors: { paper:'#eaeef7', paper2:'#dfe5f2', ink:'#161b2b', muted:'#5a6478', accent:'#2b3a8f', accent2:'#3c4fb0', rule:'#ccd5e8' },
+    dark:   { paper:'#0b0e18', paper2:'#12161f', ink:'#dde3f2', muted:'#8891a8', accent:'#8b9cf0', accent2:'#a8b6ff', rule:'#242a3a' },
+    type:   { fontSize:'17px', lineHeight:'1.9', maxWidth:'44rem' },
+  },
+];
+
+const $ = (s) => document.querySelector(s);
+const iframe = $('#preview');
+let theme = null;
+
+/* ---------- 构造控件 ---------- */
+
+function colorRow(group, key, label) {
+  const wrap = document.createElement('div');
+  wrap.className = 'row';
+  wrap.innerHTML = `
+    <label>${label}</label>
+    <input type="color" data-group="${group}" data-key="${key}">
+    <input type="text" data-group="${group}" data-key="${key}" spellcheck="false" maxlength="9">`;
+  return wrap;
+}
+
+COLOR_FIELDS.forEach(([key, label]) => {
+  $('#lightColors').appendChild(colorRow('colors', key, label));
+  $('#darkColors').appendChild(colorRow('dark', key, label));
+});
+
+// 色块和十六进制输入框互相同步（必须在下面的通用监听之前注册）
+document.querySelectorAll('input[type="color"]').forEach((el) => {
+  el.addEventListener('input', () => {
+    const text = el.parentElement.querySelector('input[type="text"]');
+    if (text) text.value = el.value;
+  });
+});
+document.querySelectorAll('input[type="text"]').forEach((el) => {
+  el.addEventListener('change', () => {
+    const v = el.value.trim();
+    if (!/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(v)) return;
+    const color = el.parentElement.querySelector('input[type="color"]');
+    if (color) color.value = v;
+  });
+});
+
+FONTS.forEach(([name, value]) => {
+  const o = document.createElement('option');
+  o.value = value;
+  o.textContent = name;
+  $('#fontBody').appendChild(o);
+});
+
+PRESETS.forEach((p, i) => {
+  const b = document.createElement('button');
+  b.className = 'preset';
+  b.innerHTML = `<span class="dots">
+      <i style="background:${p.colors.paper}"></i>
+      <i style="background:${p.colors.ink}"></i>
+      <i style="background:${p.colors.accent}"></i>
+    </span>${p.name}`;
+  b.onclick = () => {
+    theme.colors = { ...theme.colors, ...p.colors };
+    theme.dark = { ...theme.dark, ...p.dark };
+    theme.type = { ...theme.type, ...p.type };
+    sync();
+    applyLive();
+    setStatus('已套用「' + p.name + '」，还没保存', '');
+  };
+  $('#presets').appendChild(b);
+});
+
+const PAGES = [
+  ['首页', '/site/index.html'],
+  ['思想纲要', '/site/manifesto.html'],
+  ['左翼谱系', '/site/posts/left-tendencies-map.html'],
+  ['教程', '/site/posts/build-your-own-site.html'],
+  ['关于', '/site/about.html'],
+];
+PAGES.forEach(([name, url]) => {
+  const o = document.createElement('option');
+  o.value = url;
+  o.textContent = name;
+  $('#pageSel').appendChild(o);
+});
+
+/* ---------- 表单 <-> theme ---------- */
+
+function sync() {
+  document.querySelectorAll('input[data-group]').forEach((el) => {
+    const v = theme[el.dataset.group][el.dataset.key] || '';
+    el.value = v;
+  });
+  $('#fontSize').value = parseFloat(theme.type.fontSize);
+  $('#fontSizeVal').textContent = theme.type.fontSize;
+  $('#lineHeight').value = parseFloat(theme.type.lineHeight);
+  $('#lineHeightVal').textContent = theme.type.lineHeight;
+  $('#maxWidth').value = parseInt(theme.type.maxWidth, 10);
+  $('#maxWidthVal').textContent = theme.type.maxWidth;
+  $('#fontBody').value = theme.type.fontBody;
+}
+
+function readForm() {
+  document.querySelectorAll('input[data-group]').forEach((el) => {
+    const v = el.value.trim();
+    if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(v)) theme[el.dataset.group][el.dataset.key] = v;
+  });
+  theme.type.fontSize = $('#fontSize').value + 'px';
+  theme.type.lineHeight = $('#lineHeight').value;
+  theme.type.maxWidth = $('#maxWidth').value + 'rem';
+  theme.type.fontBody = $('#fontBody').value;
+}
+
+/* ---------- 实时预览 ---------- */
+
+function themeCss() {
+  const c = theme.colors;
+  const d = theme.dark;
+  const t = theme.type;
+  const vars = (o) => Object.entries(o).map(([k, v]) => {
+    const name = { paper: '--paper', paper2: '--paper-2', ink: '--ink', muted: '--muted', accent: '--red', accent2: '--red-2', rule: '--rule' }[k];
+    return name ? `  ${name}: ${v};` : '';
+  }).filter(Boolean).join('\n');
+
+  return `
+:root {
+${vars(c)}
+  --max: ${t.maxWidth};
+}
+body {
+  font-family: ${t.fontBody};
+  font-size: ${t.fontSize};
+  line-height: ${t.lineHeight};
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+${vars(d).split('\n').map((l) => '  ' + l).join('\n')}
+  }
+}`;
+}
+
+function applyLive() {
+  const doc = iframe.contentDocument;
+  if (!doc || !doc.head) return;
+  let style = doc.getElementById('__live_theme__');
+  if (!style) {
+    style = doc.createElement('style');
+    style.id = '__live_theme__';
+    doc.head.appendChild(style);
+  }
+  style.textContent = themeCss();
+}
+
+iframe.addEventListener('load', () => {
+  applyLive();
+  $('#pageSel').value = iframe.contentWindow.location.pathname + iframe.contentWindow.location.search.replace(/\?t=\d+/, '');
+});
+
+document.querySelectorAll('input[data-group], input[type="range"], select#fontBody').forEach((el) => {
+  el.addEventListener('input', () => { readForm(); applyLive(); setStatus('有未保存的改动', ''); });
+  el.addEventListener('change', () => { readForm(); applyLive(); });
+});
+
+$('#pageSel').addEventListener('change', (e) => navigate(e.target.value));
+
+function navigate(url) {
+  const buster = '?t=' + Date.now();
+  iframe.src = url + (url.includes('?') ? '&' : '') + buster.slice(1);
+}
+
+$('#reload').onclick = () => navigate(iframe.contentWindow.location.pathname);
+
+/* ---------- 读写服务端 ---------- */
+
+function setStatus(msg, cls) {
+  const el = $('#status');
+  el.textContent = msg;
+  el.className = 'status' + (cls ? ' ' + cls : '');
+}
+
+$('#save').onclick = async () => {
+  readForm();
+  setStatus('正在生成…', '');
+  try {
+    const res = await fetch('/api/theme', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(theme),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || '未知错误');
+    theme = data.theme;
+    sync();
+    setStatus('已保存到 theme.json，站点已重新生成 ✓', 'ok');
+    navigate(iframe.contentWindow.location.pathname);
+  } catch (e) {
+    setStatus('保存失败：' + e.message, 'err');
+  }
+};
+
+$('#reset').onclick = async () => {
+  const res = await fetch('/api/defaults');
+  theme = await res.json();
+  sync();
+  applyLive();
+  setStatus('已恢复默认值，点保存才会写入', '');
+};
+
+/* ---------- 启动 ---------- */
+
+(async function start() {
+  $('#port').textContent = location.host;
+  try {
+    const res = await fetch('/api/theme');
+    theme = await res.json();
+    sync();
+    applyLive();
+  } catch (e) {
+    setStatus('读取 theme.json 失败：' + e.message, 'err');
+  }
+})();
+</script>
+</body>
+</html>
