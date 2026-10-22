@@ -1,0 +1,9 @@
+{
+  "title": "小窝",
+  "description": "记录一些想法、折腾和没想明白的事。",
+  "author": "lxpwp",
+  "nav": [
+    { "name": "首页", "path": "index.html" },
+    { "name": "关于", "path": "about.html" }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "my-blog",
+  "version": "1.0.0",
+  "private": true,
+  "description": "零依赖静态博客",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js && node serve.js"
+  }
+}
