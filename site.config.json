@@ -1,9 +1,35 @@
 {
-  "title": "小窝",
-  "description": "记录一些想法、折腾和没想明白的事。",
+  "title": "冲突、纠错与解放",
+  "shortTitle": "冲突与纠错",
+  "description": "一种以劳动者主体性、制度自我纠错与有限抵抗权为核心的社会主义政治哲学。",
   "author": "lxpwp",
+  "github": "https://github.com/xinpeiliang76-del",
   "nav": [
-    { "name": "首页", "path": "index.html" },
+    { "name": "纲要", "path": "manifesto.html" },
+    { "name": "谱系", "path": "posts/left-tendencies-map.html" },
     { "name": "关于", "path": "about.html" }
+  ],
+  "cover": {
+    "kicker": "CONFLICT · CORRECTION · EMANCIPATION",
+    "title": "冲突、纠错与解放",
+    "subtitle": "——一种以劳动者主体性、制度自我纠错与有限抵抗权为核心的社会主义政治哲学",
+    "note": "文 / lxpwp · 2026"
+  },
+  "pillars": [
+    {
+      "num": "壹",
+      "name": "劳动者主体性",
+      "text": "主体性首先是判断权，其次才是行动权。劳动者能判断，也能犯错；能组织，也能解散；能坚持，也能在证据充分时改变立场。"
+    },
+    {
+      "num": "贰",
+      "name": "制度自我纠错",
+      "text": "冲突不是要被消灭的异常，而是要被制度化的信息。可见、可组织、可谈判、可终止——四条缺一不可。"
+    },
+    {
+      "num": "叁",
+      "name": "有限抵抗权",
+      "text": "抵抗权是制度对自身最终失灵的承认，具有防御性与极端性。它针对的是和平纠错渠道被系统性封闭，而非任何政策失误。"
+    }
   ]
 }

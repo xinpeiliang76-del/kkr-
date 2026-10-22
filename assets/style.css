@@ -1,297 +1,465 @@
+/* ===========================================================
+   冲突、纠错与解放 —— 版式
+   纸色 + 朱红 + 宋体，取书籍排版的比例，不取网页流行的比例
+   =========================================================== */
+
 :root {
-  --bg: #fbfaf8;
-  --fg: #1c1b19;
-  --muted: #6f6a63;
-  --line: #e5e0d8;
-  --accent: #a8552f;
-  --code-bg: #f2eee7;
-  --max: 43rem;
+  --paper: #f4efe3;
+  --paper-2: #eee7d6;
+  --ink: #1a1613;
+  --muted: #6d6255;
+  --red: #971c1c;
+  --red-2: #b23a2e;
+  --rule: #d9ceb9;
+  --max: 44rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #16171a;
-    --fg: #e7e4dd;
-    --muted: #99938a;
-    --line: #2b2c30;
-    --accent: #e08b5f;
-    --code-bg: #212227;
+    --paper: #131110;
+    --paper-2: #1c1917;
+    --ink: #e9e1d1;
+    --muted: #9b8f7e;
+    --red: #d1554a;
+    --red-2: #e0705f;
+    --rule: #302a24;
   }
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html {
-  -webkit-text-size-adjust: 100%;
-}
+html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--fg);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-    "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
-  font-size: 17px;
-  line-height: 1.75;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC",
+    "Source Han Serif CN", "SimSun", Georgia, "Times New Roman", serif;
+  font-size: 17.5px;
+  line-height: 1.95;
+  text-align: justify;
+  text-justify: inter-ideograph;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ---------- 结构 ---------- */
+::selection { background: var(--red); color: #fff; }
 
-main {
-  max-width: var(--max);
-  margin: 0 auto;
-  padding: 3rem 1.25rem 4rem;
+a { color: var(--red); text-decoration: none; border-bottom: 1px solid transparent; }
+a:hover { border-bottom-color: var(--red-2); }
+
+/* 顶部朱线 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: var(--red);
+  z-index: 10;
 }
 
-.site-head,
-.site-foot {
-  max-width: var(--max);
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem;
-  display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-}
+/* ---------------- 页头 ---------------- */
 
 .site-head {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 2.6rem 1.4rem 1.1rem;
+  display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  border-bottom: 1px solid var(--line);
+  gap: 1rem;
+  border-bottom: 1px solid var(--rule);
 }
 
 .brand {
-  font-weight: 650;
-  font-size: 1.05rem;
-  letter-spacing: 0.02em;
-  color: var(--fg);
-  text-decoration: none;
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+  border: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.brand::before {
+  content: "✳";
+  color: var(--red);
+  font-size: 0.86rem;
+  letter-spacing: 0;
 }
 
 .nav {
   display: flex;
-  gap: 1rem;
+  gap: 1.15rem;
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  text-align: left;
+}
+
+.nav a { color: var(--muted); }
+.nav a:hover { color: var(--red); }
+
+/* ---------------- 主体 ---------------- */
+
+main {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 1.4rem 5rem;
+  text-align: left;
+}
+
+/* ---------------- 封面 ---------------- */
+
+.cover {
+  padding: 3.6rem 0 3.2rem;
+}
+
+.kicker {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.34em;
+  color: var(--red);
+  margin: 0 0 1.5rem;
+  text-transform: uppercase;
+}
+
+.cover-title {
+  font-size: clamp(2.1rem, 5.6vw, 3.15rem);
+  line-height: 1.28;
+  letter-spacing: 0.09em;
+  font-weight: 700;
+  margin: 0 0 1.1rem;
+}
+
+.cover-sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 2;
+  max-width: 33rem;
+}
+
+.cover-note {
+  margin: 1.9rem 0 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+
+/* ---------------- 三条支柱 ---------------- */
+
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 3px double var(--red);
+  border-bottom: 1px solid var(--rule);
+}
+
+.pillar {
+  padding: 1.9rem 1.5rem 2.1rem 0;
+  border-left: 1px solid var(--rule);
+  padding-left: 1.5rem;
+}
+
+.pillar:first-child { padding-left: 0; border-left: none; }
+
+.pillar-num {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--red);
+  letter-spacing: 0.2em;
+  margin-bottom: 0.7rem;
+}
+
+.pillar-name {
+  font-size: 1.06rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.7rem;
+}
+
+.pillar p {
+  margin: 0;
   font-size: 0.9rem;
-}
-
-.nav a {
-  color: var(--muted);
-  text-decoration: none;
-}
-
-.nav a:hover {
-  color: var(--accent);
-}
-
-.site-foot {
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 0.85rem;
-  flex-wrap: wrap;
-}
-
-.dot {
-  opacity: 0.5;
-}
-
-/* ---------- 首页 ---------- */
-
-.hero {
-  margin-bottom: 3rem;
-}
-
-.hero h1 {
-  font-size: 2rem;
-  line-height: 1.3;
-  margin: 0 0 0.5rem;
-  letter-spacing: -0.01em;
-}
-
-.hero p {
-  margin: 0;
+  line-height: 1.9;
   color: var(--muted);
 }
 
-.post-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+/* ---------------- 近作 ---------------- */
+
+.recent { margin-top: 3.4rem; }
+
+.sec-head {
+  font-size: 0.76rem;
+  letter-spacing: 0.26em;
+  color: var(--muted);
+  font-weight: 400;
+  text-transform: uppercase;
+  margin: 0 0 0.4rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--rule);
 }
+
+.post-list { list-style: none; margin: 0; padding: 0; }
 
 .item {
-  padding: 1.15rem 0;
-  border-top: 1px solid var(--line);
+  padding: 1.55rem 0;
+  border-bottom: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: 3.2rem 1fr;
+  gap: 1rem;
 }
 
-.item:first-child {
-  border-top: none;
-  padding-top: 0;
+.item-index {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  color: var(--red);
+  letter-spacing: 0.1em;
+  padding-top: 0.42rem;
 }
 
 .item-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--fg);
-  text-decoration: none;
+  font-size: 1.14rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  border: none;
 }
 
-.item-title:hover {
-  color: var(--accent);
-}
+.item-title:hover { color: var(--red); }
 
 .meta {
-  margin: 0.35rem 0 0;
-  font-size: 0.82rem;
+  margin: 0.42rem 0 0;
+  font-size: 0.78rem;
   color: var(--muted);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.7rem;
+  letter-spacing: 0.06em;
 }
 
 .excerpt {
-  margin: 0.4rem 0 0;
+  margin: 0.5rem 0 0;
   color: var(--muted);
-  font-size: 0.94rem;
+  font-size: 0.9rem;
+  line-height: 1.85;
 }
 
-.tags {
-  display: inline-flex;
-  gap: 0.4rem;
-}
+.tags { display: inline-flex; gap: 0.45rem; }
 
 .tag {
-  background: var(--code-bg);
+  border: 1px solid var(--rule);
   color: var(--muted);
-  border-radius: 999px;
-  padding: 0.05rem 0.55rem;
-  font-size: 0.76rem;
+  padding: 0 0.5rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  line-height: 1.7;
 }
 
-/* ---------- 文章 ---------- */
+/* ---------------- 文章 ---------------- */
 
-.post h1 {
-  font-size: 1.85rem;
-  line-height: 1.35;
-  margin: 0 0 0.6rem;
-  letter-spacing: -0.012em;
+.post { padding-top: 3.2rem; }
+
+.post > h1 {
+  font-size: clamp(1.65rem, 4vw, 2.15rem);
+  line-height: 1.42;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.9rem;
 }
 
 .post > .meta {
-  padding-bottom: 1.25rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid var(--line);
+  padding-bottom: 1.3rem;
+  margin: 0 0 2.4rem;
+  border-bottom: 1px solid var(--rule);
 }
 
+.prose { font-size: 1.02rem; }
+
 .prose h2 {
-  font-size: 1.3rem;
-  margin: 2.5rem 0 0.75rem;
+  font-size: 1.24rem;
+  letter-spacing: 0.04em;
+  margin: 3.2rem 0 1.1rem;
+  padding-left: 0.9rem;
+  border-left: 3px solid var(--red);
+  line-height: 1.5;
 }
 
 .prose h3 {
-  font-size: 1.1rem;
-  margin: 2rem 0 0.6rem;
+  font-size: 1.06rem;
+  letter-spacing: 0.03em;
+  margin: 2.2rem 0 0.8rem;
 }
 
 .prose p {
-  margin: 0 0 1.25rem;
+  margin: 0 0 1.35rem;
+  text-indent: 2em;
 }
 
-.prose a {
-  color: var(--accent);
-  text-underline-offset: 3px;
-}
+.prose p:has(> img),
+.prose p:has(> a:only-child) { text-indent: 0; }
 
 .prose ul,
 .prose ol {
-  margin: 0 0 1.25rem;
-  padding-left: 1.4rem;
+  margin: 0 0 1.5rem;
+  padding-left: 1.5rem;
 }
 
-.prose li {
-  margin: 0.3rem 0;
-}
+.prose li { margin: 0.45rem 0; }
+
+.prose li p { text-indent: 0; }
+
+.prose li::marker { color: var(--red); }
 
 .prose blockquote {
-  margin: 0 0 1.25rem;
-  padding: 0.2rem 0 0.2rem 1rem;
-  border-left: 3px solid var(--line);
-  color: var(--muted);
+  margin: 2rem 0;
+  padding: 1.1rem 1.3rem;
+  background: var(--paper-2);
+  border-left: 3px solid var(--red);
+  color: var(--ink);
+  font-size: 1rem;
 }
 
 .prose blockquote p {
   margin: 0;
+  text-indent: 0;
+  color: var(--muted);
 }
 
 .prose hr {
   border: none;
-  border-top: 1px solid var(--line);
-  margin: 2.5rem 0;
+  height: 2.6rem;
+  margin: 0;
+  position: relative;
+}
+
+.prose hr::before {
+  content: "✳";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0.4rem;
+  text-align: center;
+  color: var(--red);
+  font-size: 0.8rem;
+  letter-spacing: 0;
+}
+
+.prose a { border-bottom: 1px solid var(--rule); }
+.prose a:hover { border-bottom-color: var(--red); }
+
+.prose strong { font-weight: 700; }
+
+.prose em { font-style: italic; }
+
+.prose code {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.84em;
+  background: var(--paper-2);
+  padding: 0.12em 0.34em;
+  border: 1px solid var(--rule);
+}
+
+.prose pre {
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--red);
+  padding: 1.05rem 1.15rem;
+  overflow-x: auto;
+  margin: 0 0 1.6rem;
+  line-height: 1.65;
+}
+
+.prose pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.83rem;
 }
 
 .prose img {
   max-width: 100%;
   height: auto;
-  border-radius: 6px;
-}
-
-.prose code {
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.87em;
-  background: var(--code-bg);
-  padding: 0.15em 0.35em;
-  border-radius: 4px;
-}
-
-.prose pre {
-  background: var(--code-bg);
-  padding: 1rem 1.1rem;
-  border-radius: 8px;
-  overflow-x: auto;
-  margin: 0 0 1.35rem;
-  line-height: 1.6;
-}
-
-.prose pre code {
-  background: none;
-  padding: 0;
-  font-size: 0.85rem;
+  border: 1px solid var(--rule);
 }
 
 .prose table {
   width: 100%;
   border-collapse: collapse;
-  margin: 0 0 1.35rem;
-  font-size: 0.92rem;
+  margin: 0 0 1.7rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
 }
 
 .prose th,
 .prose td {
-  border-bottom: 1px solid var(--line);
-  padding: 0.5rem 0.6rem;
+  padding: 0.55rem 0.7rem;
   text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule);
 }
 
-.prose th {
-  font-weight: 600;
-  border-bottom-width: 2px;
+.prose thead th {
+  border-bottom: 2px solid var(--ink);
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
-/* ---------- 返回 ---------- */
+.prose tbody tr:last-child td { border-bottom: none; }
+
+/* ---------------- 返回 ---------------- */
 
 .back {
-  margin-top: 3rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--line);
-  font-size: 0.9rem;
+  margin: 3.4rem 0 0;
+  padding-top: 1.4rem;
+  border-top: 3px double var(--red);
+  font-size: 0.86rem;
+  letter-spacing: 0.06em;
 }
 
-.back a {
+.back a { color: var(--muted); border: none; }
+.back a:hover { color: var(--red); }
+
+/* ---------------- 页脚 ---------------- */
+
+.site-foot {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 1.6rem 1.4rem 3rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
   color: var(--muted);
-  text-decoration: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  align-items: center;
 }
 
-.back a:hover {
-  color: var(--accent);
+.site-foot a { color: var(--muted); border: none; }
+.site-foot a:hover { color: var(--red); }
+
+.sep { opacity: 0.45; }
+
+/* ---------------- 窄屏 ---------------- */
+
+@media (max-width: 720px) {
+  body { font-size: 16.5px; line-height: 1.9; }
+
+  .site-head { padding: 1.8rem 1.1rem 0.9rem; flex-direction: column; gap: 0.7rem; align-items: flex-start; }
+  main { padding: 0 1.1rem 4rem; }
+  .cover { padding: 2.4rem 0 2.2rem; }
+
+  .pillars { grid-template-columns: 1fr; }
+  .pillar { border-left: none; padding: 1.4rem 0; border-top: 1px solid var(--rule); }
+  .pillar:first-child { border-top: none; }
+
+  .item { grid-template-columns: 1fr; gap: 0.2rem; }
+  .item-index { padding-top: 0; }
+
+  .prose p { text-indent: 0; }
+  .prose table { font-size: 0.84rem; }
+  .prose th, .prose td { padding: 0.45rem 0.4rem; }
 }

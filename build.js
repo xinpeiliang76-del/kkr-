@@ -300,6 +300,10 @@ function layout({ title, description, content, prefix, bodyClass }) {
     .join('');
   const pageTitle = title ? esc(title) + ' · ' + esc(SITE.title) : esc(SITE.title);
   const desc = esc(description || SITE.description || '');
+  const brandText = esc(SITE.shortTitle || SITE.title);
+  const gh = SITE.github
+    ? '<span class="sep">·</span><a href="' + esc(SITE.github) + '" target="_blank" rel="noopener">GitHub</a>'
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -312,7 +316,7 @@ function layout({ title, description, content, prefix, bodyClass }) {
 </head>
 <body${bodyClass ? ' class="' + bodyClass + '"' : ''}>
 <header class="site-head">
-  <a class="brand" href="${p}index.html">${esc(SITE.title)}</a>
+  <a class="brand" href="${p}index.html">${brandText}</a>
   <nav class="nav">${nav}</nav>
 </header>
 <main>
@@ -320,8 +324,9 @@ ${content}
 </main>
 <footer class="site-foot">
   <span>© ${new Date().getFullYear()} ${esc(SITE.author || SITE.title)}</span>
-  <span class="dot">·</span>
-  <span>用 Markdown 写的，静态托管</span>
+  ${gh}
+  <span class="sep">·</span>
+  <span>Markdown 写就，静态托管</span>
 </footer>
 </body>
 </html>
@@ -355,26 +360,50 @@ ${markdown(page.body)}
 }
 
 function indexPage(posts) {
+  const c = SITE.cover || {};
+  const cover = `<section class="cover">
+  <p class="kicker">${esc(c.kicker || '')}</p>
+  <h1 class="cover-title">${esc(c.title || SITE.title)}</h1>
+  <p class="cover-sub">${esc(c.subtitle || SITE.description)}</p>
+  <p class="cover-note">${esc(c.note || '')}</p>
+</section>`;
+
+  const pillarHtml = (SITE.pillars || [])
+    .map(
+      (p) => `  <div class="pillar">
+    <span class="pillar-num">${esc(p.num)}</span>
+    <h2 class="pillar-name">${esc(p.name)}</h2>
+    <p>${esc(p.text)}</p>
+  </div>`
+    )
+    .join('\n');
+
   const items = posts
-    .map((p) => {
+    .map((p, i) => {
       const tags = p.tags.length
         ? '<span class="tags">' + p.tags.map((t) => '<span class="tag">' + esc(t) + '</span>').join('') + '</span>'
         : '';
       return `  <li class="item">
-    <a class="item-title" href="posts/${p.slug}.html">${esc(p.title)}</a>
-    <p class="meta">${p.date ? '<time>' + esc(p.date) + '</time>' : ''}${tags}</p>
-    <p class="excerpt">${esc(p.summary || plain(p.body, 80))}</p>
+    <span class="item-index">${String(i + 1).padStart(2, '0')}</span>
+    <div>
+      <a class="item-title" href="posts/${p.slug}.html">${esc(p.title)}</a>
+      <p class="meta">${p.date ? '<time>' + esc(p.date) + '</time>' : ''}${tags}</p>
+      <p class="excerpt">${esc(p.summary || plain(p.body, 90))}</p>
+    </div>
   </li>`;
     })
     .join('\n');
 
-  const content = `<section class="hero">
-  <h1>${esc(SITE.title)}</h1>
-  <p>${esc(SITE.description)}</p>
+  const content = `${cover}
+<section class="pillars">
+${pillarHtml}
 </section>
-<ul class="post-list">
-${items || '  <li class="item"><p class="excerpt">还没有文章，去 posts/ 里新建一个 .md 文件吧。</p></li>'}
-</ul>`;
+<section class="recent">
+  <h2 class="sec-head">近作</h2>
+  <ul class="post-list">
+${items || '    <li class="item"><div><p class="excerpt">还没有文章。</p></div></li>'}
+  </ul>
+</section>`;
 
   return layout({ title: '', description: SITE.description, content, prefix: './' });
 }
